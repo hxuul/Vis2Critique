@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
+    <title>Main Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 30px;
+        }
+        h1 {
+            margin-top: 10px; /* Reduces the space above the heading */
+        }
+        .link-button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <h1>This is the main/overview page</h1>
+    <p>Click the button below to go to the other page(State??):</p>
+    
+    <!-- Button linking to another HTML page -->
+    <a href="map/index.html">
+        <button class="link-button">Go to Other Page</button>
+    </a>
+
+    <!-- Embed the Vega visualization directly in the main page -->
+    <div id="map"></div>
+
+    <script>
+      // Embedding the Vega map visualization
+      vegaEmbed("#map", "map2/WORLD MAP.vg.json").catch(console.error);
+    </script>
+
+</body>
+</html>

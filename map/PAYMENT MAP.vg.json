@@ -1,0 +1,197 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 1500,
+  "height": 600,
+  "title": {
+    "text": "Payments by State in Australia, 2023"
+  },
+
+  "projection": {
+  "type": "mercator",
+  "center": [133, -28],
+  "scale": 850
+  },
+
+  "params": [{
+    "name": "state_selection",
+    "bind": {
+      "input": "select",
+      "options": [
+        null,
+        "Australian Capital Territory",
+        "New South Wales",
+        "Northern Territory",
+        "Queensland",
+        "South Australia",
+        "Tasmania",
+        "Victoria",
+        "Western Australia"
+      ],
+      "labels": [
+        "Show All",
+        "Australian Capital Territory",
+        "New South Wales",
+        "Northern Territory",
+        "Queensland",
+        "South Australia",
+        "Tasmania",
+        "Victoria",
+        "Western Australia"
+
+      ],
+      "name": "State Selection: "
+    }
+  }],
+  
+  "layer": [
+    
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/hxuul/3179/refs/heads/main/map.json",
+        "format": {"type": "topojson", "feature": "graticules"}
+      },
+      "mark": {"type": "geoshape", "fill": "lightgray", "stroke": "gray"}
+    },
+    
+    {
+      "data":{
+        "url": "https://raw.githubusercontent.com/hxuul/3179/refs/heads/main/map.json",
+            "format": {
+              "type": "topojson",
+              "feature": "data"
+            }
+      },
+      "transform": [
+        {"calculate": "'Data Not Selected in ' + datum.properties.shape1", "as": "note"}
+      ],
+      "mark": {"type": "geoshape", "fill": "lightgray","stroke": "black","strokeWidth": 0.2 },
+      "encoding": {
+        "tooltip": {
+          "field": "note"
+        }
+      }
+    },
+    
+    {
+      "data":{
+        "url": "https://raw.githubusercontent.com/hxuul/3179/refs/heads/main/map.json",
+            "format": {
+              "type": "topojson",
+              "feature": "data"
+            }
+      },
+      "transform": [
+        {
+          "filter": "state_selection == null || datum.AUState == state_selection"
+        },
+        {
+          "lookup": "properties.shape1",
+          "from":{
+            "data":{
+              "url": "https://raw.githubusercontent.com/hxuul/3179/refs/heads/main/PAYMENT.csv",
+              "format":{
+                "type": "csv"
+              }
+            },
+            "key": "AUState",
+            "fields": [
+                "TotalPayments",
+                "TopPayment",
+                "SecondTopPayment",
+                "ThirdTopPayment",
+                "AUState",
+                "StatePopulation"
+                
+            ]}
+          },
+            {"calculate":"datum.TotalPayments/datum.StatePopulation * 10000" ,"as":"Payments per 10,000 population"}
+          
+        
+      ],
+      
+
+      
+      "mark": {"type": "geoshape","stroke": "black","strokeWidth": 0.2},
+      "encoding": {
+        "opacity": {
+          "value": 0.6
+        },
+        "color": {
+          "field": "Payments per 10,000 population",
+          "type": "quantitative",
+          "title": "Payments per 10,000 population",
+          "scale": {
+            "type": "threshold",
+            "domain": [3000, 4000, 5000, 6000, 7000],
+            "range": ["#f2faf9", "#fdbe85", "#fd8d3c", "#e6550d", "#bd0026", "#7f0000"]
+          }
+        },
+
+        "tooltip": [
+          {"field": "properties.shape1", "type": "nominal", "title": "Country"},
+          {"field": "Payments per 10,000 population", "type": "quantitative", "title": "Payments 10,000","format": ".2f"},
+          {"field": "TopPayment", "type": "nominal", "title": "Top 1"},
+          {"field": "SecondTopPayment", "type": "nominal", "title": "Top 2"},
+          {"field": "ThirdTopPayment", "type": "nominal", "title": "Top 3"},
+          {"field": "TotalPayments", "type": "quantitative", "title": "Total Payments"},
+          {"field": "StatePopulation", "type": "quantitative", "title": "State Population"}
+          
+        ]
+      }
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/hxuul/3179/refs/heads/main/CITIES.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {
+          "filter": "state_selection == null || datum.admin_name == state_selection"
+        }
+      ],
+      "encoding": {
+          "longitude": {"field": "lng", "type": "quantitative"},
+          "latitude": {"field": "lat", "type": "quantitative"}
+          
+        },
+      "layer": [{
+        "mark": {
+          "type": "circle",
+          "color": "#382200",
+          "size":25,
+          "opacity": 1
+        },
+        "encoding":{
+          "tooltip":[
+            {"field": "city", "type": "nominal", "title": "City"},
+            {"field": "population", "type": "quantitative", "title": "Population"}
+          ]
+
+        }
+        }, {
+          "mark": {
+            "type": "text",
+            "dy": -15,
+            "fontSize": 12,
+            "fontWeight": "bold"
+          },
+          "encoding": {
+            "text": {"field": "city", "type": "nominal"},
+            "tooltip":[
+            {"field": "city", "type": "nominal", "title": "City"},
+            {"field": "population", "type": "quantitative", "title": "Population"}
+          ]
+          }
+      }
+      
+    ]
+    }
+  ],
+  "config": { "title": { "font": "sans-serif", "fontSize": 16 },
+              "axis": {"labelFontSize": 9,"titleFontSize": 15},
+              "padding": {
+              "left": 100,
+              "right": 20
+              }
+            }
+}
